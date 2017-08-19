@@ -38,10 +38,10 @@ module BlocRecord
       options
     end
 
+    # instance_variables returns an array of variable names as atoms (i.e.
+    # [:@time, @date]). The map will return [["var_name", var_value]...].
+    # Hash will turn that into a hash: {"var_name" => var_value, ...}
     def instance_variables_to_hash(obj)
-      # instance_variables returns an array of variable names as atoms (i.e.
-      # [:@time, @date]). The map will return [["var_name", var_value]...].
-      # Hash will turn that into a hash: {"var_name" => var_value, ...}
       Hash[obj.instance_variables.map{ |var| ["#{var.to_s.delete('@')}", obj.instance_variable_get(var.to_s)] }]
     end
   end
