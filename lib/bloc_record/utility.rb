@@ -44,5 +44,17 @@ module BlocRecord
     def instance_variables_to_hash(obj)
       Hash[obj.instance_variables.map{ |var| ["#{var.to_s.delete('@')}", obj.instance_variable_get(var.to_s)] }]
     end
+
+    # Will discard any changes to a current object.
+    def reload_obj(dirty_obj)
+      # Finds the persisted value of a given object in memory.
+      persisted_obj = dirty_obj.class.find(dirty_obj.id)
+
+      # Replaces the instance_variable values in memory with the values as
+      # stored in the database.
+      dirty_obj.instance_variables.each do |instance_variable|
+        dirty_obj.instance_variable.set(instance_variable, persisted_obj.instance_variable_get(instance_variable))
+      end
+    end
   end
 end
