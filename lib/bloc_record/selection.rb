@@ -1,7 +1,7 @@
 require 'sqlite3'
 
 module Selection
-  def find(id)
+  def find_one(id)
     sql = <<-SQL
       SELECT #{columns.join ","} FROM #{table}
       WHERE id = #{id};
