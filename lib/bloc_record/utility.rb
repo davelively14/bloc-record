@@ -48,7 +48,7 @@ module BlocRecord
     # Will discard any changes to a current object.
     def reload_obj(dirty_obj)
       # Finds the persisted value of a given object in memory.
-      persisted_obj = dirty_obj.class.find(dirty_obj.id)
+      persisted_obj = dirty_obj.class.find_one(dirty_obj.id)
 
       # Replaces the instance_variable values in memory with the values as
       # stored in the database.
