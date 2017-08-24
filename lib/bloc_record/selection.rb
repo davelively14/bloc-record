@@ -58,6 +58,7 @@ module Selection
     init_object_from_new(row)
   end
 
+  # Returns either an object (if num <= 1) or an array of objects.
   def take(num=1)
     return take_one if num <= 1
 
@@ -71,6 +72,32 @@ module Selection
     rows = connection.execute(sql)
 
     rows_to_array(rows)
+  end
+
+  def first
+    sql = <<-SQL
+      SELECT #{columns.join ","}
+      FROM #{table}
+      ORDER BY id
+      ASC LIMIT 1;
+    SQL
+
+    row = connection.get_first_row(sql)
+
+    init_object_from_new(row)
+  end
+
+  def last
+    sql = <<-SQL
+      SELECT #{columns.join ","}
+      FROM #{table}
+      ORDER BY id
+      DESC LIMIT 1;
+    SQL
+
+    row = connection.get_first_row(sql)
+
+    init_object_from_new(row)
   end
 
   # My method from previous assignment. Looks like they're going to ask for it
