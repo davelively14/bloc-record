@@ -3,7 +3,8 @@ require 'sqlite3'
 module Selection
   def find_one(id)
     sql = <<-SQL
-      SELECT #{columns.join ","} FROM #{table}
+      SELECT #{columns.join ","}
+      FROM #{table}
       WHERE id = #{id};
     SQL
 
@@ -22,7 +23,8 @@ module Selection
     else
       # Reminder: columns and table are functions from Schema by way of Base
       sql = <<-SQL
-        SELECT #{columns.join ","} FROM #{table}
+        SELECT #{columns.join ","}
+        FROM #{table}
         WHERE id IN (#{ids.join(",")});
       SQL
       rows = connection.execute(sql)
@@ -31,18 +33,61 @@ module Selection
     end
   end
 
-  def find_by(col, value)
+  def find_by(attribute, value)
     sql = <<-SQL
       SELECT #{columns.join ","}
       FROM #{table}
-      WHERE #{col}=#{value}
+      WHERE #{col}=#{BlocRecord::Utility.sql_strings(value)};
     SQL
 
-    rows = connection.execute sql
+    row = connection.get_first_row(sql)
 
-    data = rows.map { |row| Hash[columns.zip(row)] }
-    data.map { |x| new(x) }
+    init_object_from_new(row)
   end
+
+  def take_one
+    sql = <<-SQL
+      SELECT #{columns.join ","}
+      FROM #{table}
+      ORDER BY random()
+      LIMIT 1;
+    SQL
+
+    row = connection.get_first_row(sql)
+
+    init_object_from_new(row)
+  end
+
+  def take(num=1)
+    return take_one if num <= 1
+
+    sql = <<-SQL
+      SELECT #{columns.join ","}
+      FROM #{table}
+      ORDER BY random()
+      LIMIT #{num};
+    SQL
+
+    rows = connection.execute(sql)
+
+    rows_to_array(rows)
+  end
+
+  # My method from previous assignment. Looks like they're going to ask for it
+  # again...I can just map rows over init_object_from_new this time, though. And
+  # use rows_to_array instead, maybe.
+  # def find_by(col, value)
+  #   sql = <<-SQL
+  #     SELECT #{columns.join ","}
+  #     FROM #{table}
+  #     WHERE #{col}=#{value}
+  #   SQL
+  #
+  #   rows = connection.execute sql
+  #
+  #   data = rows.map { |row| Hash[columns.zip(row)] }
+  #   data.map { |x| new(x) }
+  # end
 
   private
 
