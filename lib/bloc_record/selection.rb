@@ -100,9 +100,20 @@ module Selection
     init_object_from_new(row)
   end
 
+  def all
+    sql = <<-SQL
+      SELECT #{columns.join ","}
+      FROM #{table}
+    SQL
+
+    rows = connection.execute(sql)
+
+    rows_to_array(rows)
+  end
+
   # My method from previous assignment. Looks like they're going to ask for it
   # again...I can just map rows over init_object_from_new this time, though. And
-  # use rows_to_array instead, maybe.
+  # use rows_to_array instead of the map.
   # def find_by(col, value)
   #   sql = <<-SQL
   #     SELECT #{columns.join ","}
@@ -125,5 +136,9 @@ module Selection
       data = Hash[columns.zip(row)]
       new(data)
     end
+  end
+
+  def rows_to_array(rows)
+    rows.map { |row| new(Hash[columns.zip(row)]) }
   end
 end
