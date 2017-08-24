@@ -16,6 +16,23 @@ module Selection
     new(data)
   end
 
+  # This can return either an object (if just one id passed) or an array of
+  # objects. 
+  def find(*ids)
+    if ids.length == 1
+      find_one(ids.first)
+    else
+      # Reminder: columns and table are functions from Schema by way of Base
+      sql = <<-SQL
+        SELECT #{columns.join ","} FROM #{table}
+        WHERE id IN (#{ids.join(",")});
+      SQL
+      rows = connection.execute(sql)
+
+      rows_to_array(rows)
+    end
+  end
+
   def find_by(col, value)
     sql = <<-SQL
       SELECT #{columns.join ","}
