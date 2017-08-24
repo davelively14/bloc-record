@@ -10,14 +10,12 @@ module Selection
     # Gets the first row
     row = connection.get_first_row sql
 
-    # Zips the row with the columns for the object. The columns module is from
-    # Schema, which is extended by Base (along with this module).
-    data = Hash[columns.zip(row)]
-    new(data)
+    # private method below
+    init_object_from_new(row)
   end
 
   # This can return either an object (if just one id passed) or an array of
-  # objects. 
+  # objects.
   def find(*ids)
     if ids.length == 1
       find_one(ids.first)
@@ -44,5 +42,16 @@ module Selection
 
     data = rows.map { |row| Hash[columns.zip(row)] }
     data.map { |x| new(x) }
+  end
+
+  private
+
+  def init_object_from_new(row)
+    if row
+      # Zips the row with the columns for the object. The columns method is from
+      # Schema, which is extended by Base (along with this module).
+      data = Hash[columns.zip(row)]
+      new(data)
+    end
   end
 end
