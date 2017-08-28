@@ -2,7 +2,12 @@ require 'sqlite3'
 
 module Selection
   def find_one(id)
-    validate_id(id)
+    begin
+      validate_id(id)
+    rescue
+      puts "Invalid id"
+      return false
+    end
     sql = <<-SQL
       SELECT #{columns.join ","}
       FROM #{table}
@@ -19,7 +24,12 @@ module Selection
   # This can return either an object (if just one id passed) or an array of
   # objects.
   def find(*ids)
-    validate_ids(ids)
+    begin
+      validate_ids(ids)
+    rescue
+      puts "Invalid id"
+      return false
+    end
     if ids.length == 1
       find_one(ids.first)
     else
