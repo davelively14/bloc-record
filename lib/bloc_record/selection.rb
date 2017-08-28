@@ -2,6 +2,7 @@ require 'sqlite3'
 
 module Selection
   def find_one(id)
+    validate_id(id)
     sql = <<-SQL
       SELECT #{columns.join ","}
       FROM #{table}
@@ -18,6 +19,7 @@ module Selection
   # This can return either an object (if just one id passed) or an array of
   # objects.
   def find(*ids)
+    validate_ids(ids)
     if ids.length == 1
       find_one(ids.first)
     else
@@ -60,6 +62,7 @@ module Selection
 
   # Returns either an object (if num <= 1) or an array of objects.
   def take(num=1)
+    raise "Invalid input, #{num}. Must be a positive integer." if (!num.is_a? Integer) || (num < 0)
     return take_one if num <= 1
 
     sql = <<-SQL
@@ -140,5 +143,26 @@ module Selection
 
   def rows_to_array(rows)
     rows.map { |row| new(Hash[columns.zip(row)]) }
+  end
+
+  def validate_ids(ids)
+    ids.each { |id| validate_id(id) }
+    return true
+  end
+
+  def validate_id(id)
+    if id.is_a? Integer
+      raise "Invalid id, #{id}. Must be a positive integer." if id < 0
+    elsif id.is_a? String
+      if id.to_i.to_s == id
+        raise "Invalid id, #{id}. Must be a string represtation of a positive integer." if id.to_i < 0
+      else
+        raise "Invalid id, #{id}. Must be a string represtation of a positive integer."
+      end
+    else
+      raise "Invalid id, #{id}. Must be a positive integer or string representation of a positive integer."
+    end
+
+    return true
   end
 end
