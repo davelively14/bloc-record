@@ -1,6 +1,13 @@
 require 'sqlite3'
 
 module Selection
+  def method_missing(m, *args, &block)
+    if m.start_with?("find_by_")
+      m.gsub!("find_by_", "")
+      find_by(m.to_sym, args[0])
+    end
+  end
+
   def find_one(id)
     begin
       validate_id(id)
@@ -49,7 +56,7 @@ module Selection
     sql = <<-SQL
       SELECT #{columns.join ","}
       FROM #{table}
-      WHERE #{col}=#{BlocRecord::Utility.sql_strings(value)};
+      WHERE #{attribute}=#{BlocRecord::Utility.sql_strings(value)};
     SQL
 
     row = connection.get_first_row(sql)
