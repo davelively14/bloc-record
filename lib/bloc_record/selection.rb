@@ -5,6 +5,8 @@ module Selection
     if m.start_with?("find_by_")
       m.gsub!("find_by_", "")
       find_by(m.to_sym, args[0])
+    else
+      raise NoMethodError.new("Method #{m} does not exist.")
     end
   end
 
