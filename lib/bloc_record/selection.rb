@@ -133,6 +133,36 @@ module Selection
     rows_to_array(rows)
   end
 
+  def find_each(*args, &block)
+    items = all
+    items.select!(&block)
+
+    unless args == []
+      start = args[0][:start] || 0
+      batch_size = args[0][:batch_size] || items.length
+      return items[start, batch_size]
+    else
+      return items
+    end
+  end
+
+  def find_in_batches(*args, &block)
+    return [] if args == []
+    index = args[0][:start]
+    batch_size = args[0][:batch_size]
+
+    items = all
+    results = []
+
+    if index && batch_size
+      while index < items.length
+        results + items[index, batch_size] if items[index, batch_size]
+        index += batch_size
+      end
+    end
+    results
+  end
+
   # My method from previous assignment. Looks like they're going to ask for it
   # again...I can just map rows over init_object_from_new this time, though. And
   # use rows_to_array instead of the map.
