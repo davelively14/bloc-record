@@ -152,14 +152,16 @@ module Selection
     index = args[0][:start]
     batch_size = args[0][:batch_size]
     items = all
-    results = []
+    batches = []
 
     while index < items.length
-      results << items[index, batch_size].select {|item| yield item} if items[index, batch_size]
+      # This is what I would have done if we were trying to find something...but I'm just supposed to yield batches.
+      # results << items[index, batch_size].select {|item| yield item} if items[index, batch_size]
+      batches << items[index, batch_size]
       index += batch_size
     end
 
-    return results
+    yield batches
   end
 
   # My method from previous assignment. Looks like they're going to ask for it
