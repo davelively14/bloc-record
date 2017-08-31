@@ -146,24 +146,20 @@ module Selection
     items.select {|item| yield item}
   end
 
-  def find_in_batches(*args, &block)
+  def find_in_batches(*args)
     return [] unless args[0][:start] && args[0][:batch_size]
 
+    index = args[0][:start]
+    batch_size = args[0][:batch_size]
+    items = all
+    results = []
 
-    # index = args[0][:start]
-    # batch_size = args[0][:batch_size]
-    #
-    # items = all
-    # results = []
-    #
-    # if index && batch_size
-    #   while index < items.length
-    #     temp_items = items.select(&block)
-    #     results + items[index, batch_size] if items[index, batch_size]
-    #     index += batch_size
-    #   end
-    # end
-    # results
+    while index < items.length
+      results << items[index, batch_size].select {|item| yield item} if items[index, batch_size]
+      index += batch_size
+    end
+
+    return results
   end
 
   # My method from previous assignment. Looks like they're going to ask for it
