@@ -167,6 +167,7 @@ module Selection
   # Example:
   # Entry.where("phone_number = ?", params[:phone_number])
   # Entry.where("phone_number = '999-999-9999'")
+  # Entry.where(name: 'BlocHead')
   def where(*args)
     if args.count > 1
       expression = args.shift
@@ -175,6 +176,9 @@ module Selection
       case args.first
       when String
         expression = args.first
+      when Hash
+        expression_hash = BlocRecord::Utility.convert_keys(args.first)
+        expression = expression_hash.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
       end
     end
 
