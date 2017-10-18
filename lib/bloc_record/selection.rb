@@ -164,10 +164,19 @@ module Selection
     yield batches
   end
 
+  # Example:
+  # Entry.where("phone_number = ?", params[:phone_number])
+  # Entry.where("phone_number = '999-999-9999'")
   def where(*args)
     if args.count > 1
       expression = args.shift
       params = args
+    else
+      case args.first
+      when String
+        expression = args.first
+      end
+    end
 
       # Reminder: columns and table are methods from Schema by way of Base
       sql = <<-SQL
@@ -178,7 +187,6 @@ module Selection
       # Reminder: connection is a method from Connection by way of Base
       rows = connection.execute(sql, params)
       rows_to_array(rows)
-    end
   end
 
   # My method from previous assignment. Looks like they're going to ask for it
