@@ -164,6 +164,23 @@ module Selection
     yield batches
   end
 
+  def where(*args)
+    if args.count > 1
+      expression = args.shift
+      params = args
+
+      # Reminder: columns and table are methods from Schema by way of Base
+      sql = <<-SQL
+        SELECT #{columns.join ","} FROM #{table}
+        WHERE #{expression};
+      SQL
+
+      # Reminder: connection is a method from Connection by way of Base
+      rows = connection.execute(sql, params)
+      rows_to_array(rows)
+    end
+  end
+
   # My method from previous assignment. Looks like they're going to ask for it
   # again...I can just map rows over init_object_from_new this time, though. And
   # use rows_to_array instead of the map.
