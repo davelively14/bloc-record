@@ -193,6 +193,24 @@ module Selection
       rows_to_array(rows)
   end
 
+  # Example:
+  # Entry.order("phone_number")
+  # Entry.order("phone_number, name")
+  # Entry.order(:phone_number)
+  def order(order)
+    order = order.to_s
+
+    # Reminder: table is a method from Schema by way of Base
+    sql = <<-SQL
+      SELECT * FROM #{table}
+      ORDER BY #{order};
+    SQL
+
+    # Reminder: connection is a method from Connection by way of Base
+    rows = connection.execute(sql)
+    rows_to_array(rows)
+  end
+
   # My method from previous assignment. Looks like they're going to ask for it
   # again...I can just map rows over init_object_from_new this time, though. And
   # use rows_to_array instead of the map.
