@@ -197,8 +197,13 @@ module Selection
   # Entry.order("phone_number")
   # Entry.order("phone_number, name")
   # Entry.order(:phone_number)
-  def order(order)
-    order = order.to_s
+  def order(*args)
+    if args.count > 1
+      order = args.join(",")
+    else
+      order = order.first.to_s
+    end
+
 
     # Reminder: table is a method from Schema by way of Base
     sql = <<-SQL
