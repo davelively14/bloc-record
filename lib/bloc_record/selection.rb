@@ -216,6 +216,29 @@ module Selection
     rows_to_array(rows)
   end
 
+  # Example:
+  # Employee.join('JOIN table_name ON some_condition')
+  # Employee.join(:department)
+  def join(arg)
+    if arg.class == String
+      # Reminder: table is a method from Schema by way of Base
+      sql = <<-SQL
+        SELECT * FROM #{table} #{BlocRecord::Utility.sql_strings(arg)};
+      SQL
+    elsif arg.class == Symbol
+      # Reminder: table is a method from Schema by way of Base
+      sql = <<-SQL
+        SELECT * FROM #{table}
+        INNER JOIN #{arg} ON #{arg}.#{table}_id = #{table}.id
+      SQL
+    end
+
+
+    # Reminder: connection is a method from Connection by way of Base
+    rows = connection.execute(sql)
+    rows_to_array(rows)
+  end
+
   # My method from previous assignment. Looks like they're going to ask for it
   # again...I can just map rows over init_object_from_new this time, though. And
   # use rows_to_array instead of the map.
