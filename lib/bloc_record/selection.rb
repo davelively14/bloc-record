@@ -125,7 +125,7 @@ module Selection
   def all
     sql = <<-SQL
       SELECT #{columns.join ","}
-      FROM #{table}
+      FROM #{table};
     SQL
 
     rows = connection.execute(sql)
@@ -219,20 +219,27 @@ module Selection
   # Example:
   # Employee.join('JOIN table_name ON some_condition')
   # Employee.join(:department)
-  def join(arg)
-    if arg.class == String
-      # Reminder: table is a method from Schema by way of Base
-      sql = <<-SQL
-        SELECT * FROM #{table} #{BlocRecord::Utility.sql_strings(arg)};
-      SQL
-    elsif arg.class == Symbol
-      # Reminder: table is a method from Schema by way of Base
-      sql = <<-SQL
-        SELECT * FROM #{table}
-        INNER JOIN #{arg} ON #{arg}.#{table}_id = #{table}.id
-      SQL
-    end
+  def join(*args)
 
+    # Reminder: table is a method from Schema by way of Base
+    if args.count > 1
+      joins = args.map { |arg| "INNER JOIN #{arg} ON #{arg}.#{table}_id = #{table}.id"}.join(" ")
+      sql = <<-SQL
+        SELECT * FROM #{table} #{joins};
+      SQL
+    else
+      case args.first
+      when STRING
+        sql = <<-SQL
+          SELECT * FROM #{table} #{BlocRecord::Utility.sql_strings(args.first)};
+        SQL
+      when Symbol
+        sql = <<-SQL
+          SELECT * FROM #{table}
+          INNER JOIN #{args.first} ON #{args.first}.#{table}_id = #{table}.id;
+        SQL
+      end
+    end
 
     # Reminder: connection is a method from Connection by way of Base
     rows = connection.execute(sql)
